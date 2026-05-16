@@ -30,29 +30,15 @@ const commands = [
 
   new SlashCommandBuilder()
     .setName("addinc")
-    .setDescription("Add an incense channel.")
-    .addChannelOption((opt) =>
-      opt
-        .setName("channel")
-        .setDescription("Channel to add")
-        .addChannelTypes(ChannelType.GuildText)
-        .setRequired(true)
-    ),
+    .setDescription("Add current channel as an incense channel."),
 
   new SlashCommandBuilder()
     .setName("removeinc")
-    .setDescription("Remove an incense channel.")
-    .addChannelOption((opt) =>
-      opt
-        .setName("channel")
-        .setDescription("Channel to remove")
-        .addChannelTypes(ChannelType.GuildText)
-        .setRequired(true)
-    ),
+    .setDescription("Remove current channel as an incense channel."),
 
   new SlashCommandBuilder()
-		.setName("addallinc")
-		.setDescription("Add all text channels in the current category."),
+    .setName("addallinc")
+    .setDescription("Add all text channels in the current category."),
 
   new SlashCommandBuilder()
     .setName("clearallinc")
@@ -64,22 +50,15 @@ const commands = [
 
   new SlashCommandBuilder()
     .setName("pause")
-    .setDescription("Pause one incense channel.")
-    .addChannelOption((opt) =>
-      opt
-        .setName("channel")
-        .setDescription("Channel to pause")
-        .addChannelTypes(ChannelType.GuildText)
-        .setRequired(false)
-    ),
+    .setDescription("Pause current incense channel."),
 
   new SlashCommandBuilder()
-		.setName("resume")
-		.setDescription("Resume the current channel."),
+    .setName("resume")
+    .setDescription("Resume current incense channel."),
 
-	new SlashCommandBuilder()
-		.setName("botstatus")
-		.setDescription("View bot status."),
+  new SlashCommandBuilder()
+    .setName("botstatus")
+    .setDescription("Check bot ping and role status."),
 
   new SlashCommandBuilder()
     .setName("pauseall")
@@ -93,10 +72,13 @@ const commands = [
 const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
 
 (async () => {
-  await rest.put(
-		Routes.applicationCommands(process.env.CLIENT_ID),
-		{ body: commands }
-	);
+  try {
+    await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
+      body: commands,
+    });
 
-  console.log("Slash commands deployed.");
+    console.log("Global slash commands deployed.");
+  } catch (err) {
+    console.error(err);
+  }
 })();
