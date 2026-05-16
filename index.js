@@ -291,33 +291,32 @@ client.on("interactionCreate", async (interaction) => {
 			);
 		}
 
-    if (commandName === "addallinc") {
-			const currentChannel = interaction.channel;
+		if (commandName === "addallinc") {
+      const category =
+        interaction.options.getChannel("category");
 
-			if (!currentChannel.parentId) {
-				return interaction.reply({
-					content: "This channel is not inside a category.",
-					ephemeral: true,
-				});
-			}
+      const channels =
+        interaction.guild.channels.cache.filter(
+          (c) =>
+            c.parentId === category.id &&
+            c.type === ChannelType.GuildText
+        );
 
-			const channels = interaction.guild.channels.cache.filter(
-				(c) =>
-					c.parentId === currentChannel.parentId &&
-					c.type === ChannelType.GuildText
-			);
+      let added = 0;
 
-			let added = 0;
+      for (const [, channel] of channels) {
+        addIncenseChannel(
+          interaction.guild.id,
+          channel.id
+        );
 
-			for (const [, channel] of channels) {
-				addIncenseChannel(interaction.guild.id, channel.id);
-				added++;
-			}
+        added++;
+      }
 
-			return interaction.reply(
-				`<a:1_:1504337333028126812> Added ${added} channels from this category.`
-			);
-		}
+      return interaction.reply(
+        `<a:1_:1504337333028126812> Added ${added} channels`
+      );
+    }
 
 		if (commandName === "botstatus") {
 			const botMember = interaction.guild.members.me;
@@ -421,12 +420,16 @@ client.on("interactionCreate", async (interaction) => {
     }
 
     if (commandName === "resume") {
-			await resumeChannel(interaction.channel);
+      const channel =
+        interaction.options.getChannel("channel") ||
+        interaction.channel;
 
-			return interaction.reply(
-				`<a:1_:1504337333028126812> Resumed ${interaction.channel}`
-			);
-		}
+      await resumeChannel(channel);
+
+      return interaction.reply(
+        `<a:1_:1504337333028126812> Resumed ${channel}`
+      );
+    }
 
     if (commandName === "pauseall") {
       const channels = getIncenseChannels(
