@@ -93,16 +93,42 @@ function setPaused(channelId, value) {
 
 async function pauseChannel(channel) {
   const poketwoId = process.env.INCENSE_BOT_ID;
+  const poketwoRoleId = process.env.POKETWO_ROLE_ID;
 
-  if (!poketwoId) {
-    console.log("Missing INCENSE_BOT_ID in .env");
-    return;
+  const overwrites = [];
+
+  if (poketwoId) {
+    const poketwoMember = await channel.guild.members
+      .fetch(poketwoId)
+      .catch(() => null);
+
+    if (poketwoMember) {
+      overwrites.push(poketwoMember);
+    } else {
+      console.log("Pokétwo member not found. Check INCENSE_BOT_ID.");
+    }
   }
 
-  await channel.permissionOverwrites.edit(poketwoId, {
-    ViewChannel: false,
-    SendMessages: false,
-  });
+  if (poketwoRoleId) {
+    const poketwoRole = channel.guild.roles.cache.get(poketwoRoleId);
+
+    if (poketwoRole) {
+      overwrites.push(poketwoRole);
+    } else {
+      console.log("Pokétwo role not found. Check POKETWO_ROLE_ID.");
+    }
+  }
+
+  if (!overwrites.length) {
+    throw new Error("No valid Pokétwo user/role found for pause.");
+  }
+
+  for (const target of overwrites) {
+    await channel.permissionOverwrites.edit(target, {
+      ViewChannel: false,
+      SendMessages: false,
+    });
+  }
 
   setPaused(channel.id, true);
   startOverpauseTimer(channel);
@@ -112,16 +138,42 @@ async function pauseChannel(channel) {
 
 async function resumeChannel(channel) {
   const poketwoId = process.env.INCENSE_BOT_ID;
+  const poketwoRoleId = process.env.POKETWO_ROLE_ID;
 
-  if (!poketwoId) {
-    console.log("Missing INCENSE_BOT_ID in .env");
-    return;
+  const overwrites = [];
+
+  if (poketwoId) {
+    const poketwoMember = await channel.guild.members
+      .fetch(poketwoId)
+      .catch(() => null);
+
+    if (poketwoMember) {
+      overwrites.push(poketwoMember);
+    } else {
+      console.log("Pokétwo member not found. Check INCENSE_BOT_ID.");
+    }
   }
 
-  await channel.permissionOverwrites.edit(poketwoId, {
-    ViewChannel: null,
-    SendMessages: null,
-  });
+  if (poketwoRoleId) {
+    const poketwoRole = channel.guild.roles.cache.get(poketwoRoleId);
+
+    if (poketwoRole) {
+      overwrites.push(poketwoRole);
+    } else {
+      console.log("Pokétwo role not found. Check POKETWO_ROLE_ID.");
+    }
+  }
+
+  if (!overwrites.length) {
+    throw new Error("No valid Pokétwo user/role found for resume.");
+  }
+
+  for (const target of overwrites) {
+    await channel.permissionOverwrites.edit(target, {
+      ViewChannel: null,
+      SendMessages: null,
+    });
+  }
 
   setPaused(channel.id, false);
   clearOverpauseTimer(channel.id);
