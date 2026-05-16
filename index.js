@@ -384,23 +384,28 @@ client.on("interactionCreate", async (interaction) => {
 
 			const bought = channels.filter((c) => c.is_bought);
 			const notBought = channels.filter((c) => !c.is_bought);
-
+			
+			const notBoughtList = notBought
+			  .slice(0, 25)
+			  .map((c) => `<#${c.channel_id}>`)
+			  .join("\n");
+			
+			const extraCount = Math.max(0, notBought.length - 25);
+			
 			const embed = new EmbedBuilder()
-				.setTitle("<:2_:1504337334966026353> Incense Status")
-				.setColor(0xF4A6C1)
-				.setDescription(
-					`**${bought.length}/${channels.length}** channels bought`
-				)
-				.addFields({
-					name: `<:4_:1504337338208227329> Not Bought (${notBought.length})`,
-					value:
-						notBought.length > 0
-							? notBought
-									.map((c) => `<#${c.channel_id}>`)
-									.join("\n")
-							: "All channels bought <a:3_:1504337336375312569>",
-				})
-				.setTimestamp();
+			  .setTitle("<:2_:1504337334966026353> Incense Status")
+			  .setColor("#F4A6C1")
+			  .setDescription(`**${bought.length}/${channels.length}** channels bought`)
+			  .addFields({
+			    name: `❌ Not Bought (${notBought.length})`,
+			    value:
+			      notBought.length > 0
+			        ? `${notBoughtList}${
+			            extraCount > 0 ? `\n...and ${extraCount} more` : ""
+			          }`
+			        : "All channels bought ✅",
+			  })
+			  .setTimestamp();
 
 			return interaction.reply({
 				embeds: [embed],
