@@ -51,15 +51,8 @@ const commands = [
     ),
 
   new SlashCommandBuilder()
-    .setName("addallinc")
-    .setDescription("Add all text channels in a category.")
-    .addChannelOption((opt) =>
-      opt
-        .setName("category")
-        .setDescription("Category")
-        .addChannelTypes(ChannelType.GuildCategory)
-        .setRequired(true)
-    ),
+		.setName("addallinc")
+		.setDescription("Add all text channels in the current category."),
 
   new SlashCommandBuilder()
     .setName("clearallinc")
@@ -81,15 +74,8 @@ const commands = [
     ),
 
   new SlashCommandBuilder()
-    .setName("resume")
-    .setDescription("Resume one incense channel.")
-    .addChannelOption((opt) =>
-      opt
-        .setName("channel")
-        .setDescription("Channel to resume")
-        .addChannelTypes(ChannelType.GuildText)
-        .setRequired(false)
-    ),
+		.setName("resume")
+		.setDescription("Resume the current channel."),
 
 	new SlashCommandBuilder()
 		.setName("botstatus")
