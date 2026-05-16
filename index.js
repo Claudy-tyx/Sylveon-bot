@@ -196,7 +196,7 @@ client.on("interactionCreate", async (interaction) => {
     }
 
     if (
-      ["setwatchannel", "pauseall", "resumeall", "clearallinc"].includes(commandName)
+      ["setwatchannel", "pauseall", "resumeall", "clearallinc", "addinc", "removeinc", "addallinc"].includes(commandName)
     ) {
       if (!hasStaffRole(interaction.member, interaction.guild.id)) {
         return interaction.reply({
@@ -240,31 +240,32 @@ client.on("interactionCreate", async (interaction) => {
 		}
 
     if (commandName === "addallinc") {
-      const category =
-        interaction.options.getChannel("category");
+			const currentChannel = interaction.channel;
 
-      const channels =
-        interaction.guild.channels.cache.filter(
-          (c) =>
-            c.parentId === category.id &&
-            c.type === ChannelType.GuildText
-        );
+			if (!currentChannel.parentId) {
+				return interaction.reply({
+					content: "This channel is not inside a category.",
+					ephemeral: true,
+				});
+			}
 
-      let added = 0;
+			const channels = interaction.guild.channels.cache.filter(
+				(c) =>
+					c.parentId === currentChannel.parentId &&
+					c.type === ChannelType.GuildText
+			);
 
-      for (const [, channel] of channels) {
-        addIncenseChannel(
-          interaction.guild.id,
-          channel.id
-        );
+			let added = 0;
 
-        added++;
-      }
+			for (const [, channel] of channels) {
+				addIncenseChannel(interaction.guild.id, channel.id);
+				added++;
+			}
 
-      return interaction.reply(
-        `<a:1_:1504337333028126812> Added ${added} channels`
-      );
-    }
+			return interaction.reply(
+				`<a:1_:1504337333028126812> Added ${added} channels from this category.`
+			);
+		}
 
 		if (commandName === "botstatus") {
 			const botMember = interaction.guild.members.me;
@@ -286,11 +287,7 @@ client.on("interactionCreate", async (interaction) => {
 
 			const embed = new EmbedBuilder()
 				.setTitle("🤖 Bot Status")
-				.setColor(
-					botHighestRole > poketwoHighestRole
-						? 0x57f287
-						: 0xed4245
-				)
+				.setColor(0xF4A6C1)
 				.addFields(
 					{
 						name: "<:4_:1504337338208227329> Ping",
@@ -339,7 +336,7 @@ client.on("interactionCreate", async (interaction) => {
 
 			const embed = new EmbedBuilder()
 				.setTitle("<:2_:1504337334966026353> Incense Status")
-				.setColor(notBought.length ? 0xff9900 : 0x57f287)
+				.setColor(0xF4A6C1)
 				.setDescription(
 					`**${bought.length}/${channels.length}** channels bought`
 				)
@@ -372,16 +369,12 @@ client.on("interactionCreate", async (interaction) => {
     }
 
     if (commandName === "resume") {
-      const channel =
-        interaction.options.getChannel("channel") ||
-        interaction.channel;
+			await resumeChannel(interaction.channel);
 
-      await resumeChannel(channel);
-
-      return interaction.reply(
-        `<a:1_:1504337333028126812> Resumed ${channel}`
-      );
-    }
+			return interaction.reply(
+				`<a:1_:1504337333028126812> Resumed ${interaction.channel}`
+			);
+		}
 
     if (commandName === "pauseall") {
       const channels = getIncenseChannels(
