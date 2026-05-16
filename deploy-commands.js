@@ -30,15 +30,36 @@ const commands = [
 
   new SlashCommandBuilder()
     .setName("addinc")
-    .setDescription("Add current channel as an incense channel."),
+    .setDescription("Add an incense channel.")
+    .addChannelOption((opt) =>
+      opt
+        .setName("channel")
+        .setDescription("Channel to add")
+        .addChannelTypes(ChannelType.GuildText)
+        .setRequired(true)
+    ),
 
   new SlashCommandBuilder()
     .setName("removeinc")
-    .setDescription("Remove current channel as an incense channel."),
+    .setDescription("Remove an incense channel.")
+    .addChannelOption((opt) =>
+      opt
+        .setName("channel")
+        .setDescription("Channel to remove")
+        .addChannelTypes(ChannelType.GuildText)
+        .setRequired(true)
+    ),
 
   new SlashCommandBuilder()
     .setName("addallinc")
-    .setDescription("Add all text channels in the current category."),
+    .setDescription("Add all text channels in a category.")
+    .addChannelOption((opt) =>
+      opt
+        .setName("category")
+        .setDescription("Category")
+        .addChannelTypes(ChannelType.GuildCategory)
+        .setRequired(true)
+    ),
 
   new SlashCommandBuilder()
     .setName("clearallinc")
@@ -50,15 +71,29 @@ const commands = [
 
   new SlashCommandBuilder()
     .setName("pause")
-    .setDescription("Pause current incense channel."),
+    .setDescription("Pause one incense channel.")
+    .addChannelOption((opt) =>
+      opt
+        .setName("channel")
+        .setDescription("Channel to pause")
+        .addChannelTypes(ChannelType.GuildText)
+        .setRequired(false)
+    ),
 
   new SlashCommandBuilder()
     .setName("resume")
-    .setDescription("Resume current incense channel."),
+    .setDescription("Resume one incense channel.")
+    .addChannelOption((opt) =>
+      opt
+        .setName("channel")
+        .setDescription("Channel to resume")
+        .addChannelTypes(ChannelType.GuildText)
+        .setRequired(false)
+    ),
 
-  new SlashCommandBuilder()
-    .setName("botstatus")
-    .setDescription("Check bot ping and role status."),
+	new SlashCommandBuilder()
+		.setName("botstatus")
+		.setDescription("View bot status."),
 
   new SlashCommandBuilder()
     .setName("pauseall")
@@ -72,13 +107,10 @@ const commands = [
 const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
 
 (async () => {
-  try {
-    await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
-      body: commands,
-    });
+  await rest.put(
+		Routes.applicationCommands(process.env.CLIENT_ID),
+		{ body: commands }
+	);
 
-    console.log("Global slash commands deployed.");
-  } catch (err) {
-    console.error(err);
-  }
+  console.log("Slash commands deployed.");
 })();
