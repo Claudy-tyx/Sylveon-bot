@@ -133,7 +133,7 @@ async function pauseChannel(channel) {
   setPaused(channel.id, true);
   startOverpauseTimer(channel);
 
-  console.log(`Paused Pokétwo in ${channel.name}`);
+  
 }
 
 async function resumeChannel(channel) {
@@ -178,7 +178,7 @@ async function resumeChannel(channel) {
   setPaused(channel.id, false);
   clearOverpauseTimer(channel.id);
 
-  console.log(`Resumed Pokétwo in ${channel.name}`);
+  
 }
 
 function clearOverpauseTimer(channelId) {
@@ -437,41 +437,88 @@ client.on("interactionCreate", async (interaction) => {
     }
 
     if (commandName === "pauseall") {
-      const channels = getIncenseChannels(
-        interaction.guild.id
-      );
+			await interaction.deferReply();
 
-      for (const row of channels) {
-        const channel =
-          interaction.guild.channels.cache.get(
-            row.channel_id
-          );
+			const rows = getIncenseChannels(interaction.guild.id);
 
-        if (!channel) continue;
+			let success = 0;
+			let failed = 0;
+			const failedChannels = [];
 
-        await pauseChannel(channel);
-      }
+			for (const row of rows) {
+				const channel = await interaction.guild.channels
+					.fetch(row.channel_id)
+					.catch(() => null);
 
-      return interaction.reply(
-        "<a:1_:1504337333028126812> Paused all incense channels."
-      );
-    }
+				if (!channel) {
+					failed++;
+					failedChannels.push(`<#${row.channel_id}> not found`);
+					continue;
+				}
+
+				try {
+					await pauseChannel(channel);
+					success++;
+				} catch (err) {
+					failed++;
+					failedChannels.push(`${channel} — ${err.message}`);
+					
+				}
+			}
+
+			return interaction.editReply(
+				[
+					`<a:1_:1504337333028126812> Paused all channels.`,
+					`✅ Paused: ${success}`,
+					`❌ Failed: ${failed}`,
+					failedChannels.length
+						? `\nFailed channels:\n${failedChannels.slice(0, 10).join("\n")}`
+						: "",
+				].join("\n")
+			);
+		}
 
     if (commandName === "resumeall") {
-			const channels = getIncenseChannels(interaction.guild.id);
+			await interaction.deferReply();
 
-			for (const row of channels) {
-				const channel = interaction.guild.channels.cache.get(row.channel_id);
+			const rows = getIncenseChannels(interaction.guild.id);
 
-				if (!channel) continue;
+			let success = 0;
+			let failed = 0;
+			const failedChannels = [];
 
-				await resumeChannel(channel);
+			for (const row of rows) {
+				const channel = await interaction.guild.channels
+					.fetch(row.channel_id)
+					.catch(() => null);
+
+				if (!channel) {
+					failed++;
+					failedChannels.push(`<#${row.channel_id}> not found`);
+					continue;
+				}
+
+				try {
+					await resumeChannel(channel);
+					success++;
+				} catch (err) {
+					failed++;
+					failedChannels.push(`${channel} — ${err.message}`);
+					
+				}
 			}
 
 			resetAllBought(interaction.guild.id);
 
-			return interaction.reply(
-				"<a:1_:1504337333028126812> Resumed all incense channels."
+			return interaction.editReply(
+				[
+					`<a:1_:1504337333028126812> Resumed all channels.`,
+					`✅ Resumed: ${success}`,
+					`❌ Failed: ${failed}`,
+					failedChannels.length
+						? `\nFailed channels:\n${failedChannels.slice(0, 10).join("\n")}`
+						: "",
+				].join("\n")
 			);
 		}
   } catch (err) {
@@ -507,7 +554,7 @@ client.on("messageCreate", async (message) => {
     if (message.content.includes(process.env.INCENSE_BOUGHT_TEXT)) {
 			setBought(message.channel.id, true);
 
-			console.log(`Incense bought in ${message.channel.name}`);
+			
 
 			await pauseChannel(message.channel);
 
@@ -515,7 +562,7 @@ client.on("messageCreate", async (message) => {
 				"<a:1_:1504337333028126812> Channel paused."
 			);
 
-			console.log(`Auto-paused ${message.channel.name}`);
+			
 		}
   } catch (err) {
     console.error(err);
