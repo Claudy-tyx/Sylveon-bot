@@ -611,6 +611,10 @@ client.on("messageCreate", async (message) => {
 			startOverpauseTimer(message.channel);
 		}
 
+		if (message.content.includes("Incense has been resumed.")) {
+			clearOverpauseTimer(message.channel.id);
+		}
+
   } catch (err) {
     console.error(err);
   }
