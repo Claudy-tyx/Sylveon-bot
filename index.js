@@ -131,7 +131,7 @@ async function pauseChannel(channel) {
   }
 
   setPaused(channel.id, true);
-  startOverpauseTimer(channel);
+  
 
   
 }
@@ -436,7 +436,49 @@ client.on("interactionCreate", async (interaction) => {
       );
     }
 
-    if (commandName === "pauseall") {
+		if (commandName === "resumeall") {
+			await interaction.reply("<a:1_:1504337333028126812> All incense channels resumed.");
+
+			const rows = getIncenseChannels(interaction.guild.id);
+
+			for (const row of rows) {
+				const channel = await interaction.guild.channels
+					.fetch(row.channel_id)
+					.catch(() => null);
+
+				if (!channel) continue;
+
+				resumeChannel(channel).catch((err) => {
+					console.error(`Failed to resume ${channel.name}:`, err.message);
+				});
+			}
+
+			resetAllBought(interaction.guild.id);
+		}
+
+		if (commandName === "pauseall") {
+			await interaction.reply("<a:1_:1504337333028126812> All incense channels paused.");
+
+			const rows = getIncenseChannels(interaction.guild.id);
+
+			for (const row of rows) {
+				const channel = await interaction.guild.channels
+					.fetch(row.channel_id)
+					.catch(() => null);
+
+				if (!channel) continue;
+
+				pauseChannel(channel).catch((err) => {
+					console.error(`Failed to pause ${channel.name}:`, err.message);
+				});
+
+				await new Promise((resolve) =>
+					setTimeout(resolve, 150)
+				);
+			}
+		}
+
+    if (commandName === "testpauseall") {
 			await interaction.deferReply();
 
 			const rows = getIncenseChannels(interaction.guild.id);
@@ -478,7 +520,7 @@ client.on("interactionCreate", async (interaction) => {
 			);
 		}
 
-    if (commandName === "resumeall") {
+    if (commandName === "testresumeall") {
 			await interaction.deferReply();
 
 			const rows = getIncenseChannels(interaction.guild.id);
@@ -564,6 +606,11 @@ client.on("messageCreate", async (message) => {
 
 			
 		}
+
+		if (message.content.includes("Incense has been paused")) {
+			startOverpauseTimer(message.channel);
+		}
+
   } catch (err) {
     console.error(err);
   }
