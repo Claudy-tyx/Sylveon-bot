@@ -30,36 +30,15 @@ const commands = [
 
   new SlashCommandBuilder()
     .setName("addinc")
-    .setDescription("Add an incense channel.")
-    .addChannelOption((opt) =>
-      opt
-        .setName("channel")
-        .setDescription("Channel to add")
-        .addChannelTypes(ChannelType.GuildText)
-        .setRequired(true)
-    ),
+    .setDescription("Add current channel as an incense channel."),
 
   new SlashCommandBuilder()
     .setName("removeinc")
-    .setDescription("Remove an incense channel.")
-    .addChannelOption((opt) =>
-      opt
-        .setName("channel")
-        .setDescription("Channel to remove")
-        .addChannelTypes(ChannelType.GuildText)
-        .setRequired(true)
-    ),
+    .setDescription("Remove current channel as an incense channel."),
 
   new SlashCommandBuilder()
     .setName("addallinc")
-    .setDescription("Add all text channels in a category.")
-    .addChannelOption((opt) =>
-      opt
-        .setName("category")
-        .setDescription("Category")
-        .addChannelTypes(ChannelType.GuildCategory)
-        .setRequired(true)
-    ),
+    .setDescription("Add all text channels in the current category."),
 
   new SlashCommandBuilder()
     .setName("clearallinc")
@@ -71,29 +50,15 @@ const commands = [
 
   new SlashCommandBuilder()
     .setName("pause")
-    .setDescription("Pause one incense channel.")
-    .addChannelOption((opt) =>
-      opt
-        .setName("channel")
-        .setDescription("Channel to pause")
-        .addChannelTypes(ChannelType.GuildText)
-        .setRequired(false)
-    ),
+    .setDescription("Pause current incense channel."),
 
   new SlashCommandBuilder()
     .setName("resume")
-    .setDescription("Resume one incense channel.")
-    .addChannelOption((opt) =>
-      opt
-        .setName("channel")
-        .setDescription("Channel to resume")
-        .addChannelTypes(ChannelType.GuildText)
-        .setRequired(false)
-    ),
+    .setDescription("Resume current incense channel."),
 
-	new SlashCommandBuilder()
-		.setName("botstatus")
-		.setDescription("View bot status."),
+  new SlashCommandBuilder()
+    .setName("botstatus")
+    .setDescription("Check bot ping and role status."),
 
   new SlashCommandBuilder()
     .setName("pauseall")
@@ -102,15 +67,27 @@ const commands = [
   new SlashCommandBuilder()
     .setName("resumeall")
     .setDescription("Resume all incense channels."),
+
+  new SlashCommandBuilder()
+    .setName("testpauseall")
+    .setDescription("Test pause all incense channels."),
+
+  new SlashCommandBuilder()
+    .setName("testresumeall")
+    .setDescription(" Test resume all incense channels."),
+
 ].map((cmd) => cmd.toJSON());
 
 const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN);
 
 (async () => {
-  await rest.put(
-		Routes.applicationCommands(process.env.CLIENT_ID),
-		{ body: commands }
-	);
+  try {
+    await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
+      body: commands,
+    });
 
-  console.log("Slash commands deployed.");
+    console.log("Global slash commands deployed.");
+  } catch (err) {
+    console.error(err);
+  }
 })();
