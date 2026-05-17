@@ -21,6 +21,8 @@ Designed for Pokétwo mass incense servers.
 * `/resume` → Resume Pokétwo in current channel
 * `/pauseall` → Pause all tracked channels
 * `/resumeall` → Resume all tracked channels and reset bought status
+* `/testpauseall` → Pause all tracked channels while showing any failed channels
+* `/testresumeall` → Resume all tracked channels while showing any failed channels
 
 ## Tracking
 
@@ -83,10 +85,23 @@ INCENSE_BOUGHT_TEXT=You purchased an Incense for 50 shards!
 npm run dev
 ```
 
-## Normal Start
+## Railway / Production Startup
 
 ```bash
 npm start
+```
+
+The production startup automatically:
+
+```txt
+→ Deploys global slash commands
+→ Starts the bot
+```
+
+This is handled by:
+
+```txt
+start.js
 ```
 
 ---
@@ -108,6 +123,15 @@ node deploy-commands.js
 ```
 
 Global commands may take a few minutes to appear.
+
+When hosted on Railway, slash commands are automatically redeployed every restart through:
+
+```txt
+npm start
+→ start.js
+→ deploy-commands.js
+→ index.js
+```
 
 ---
 
@@ -159,8 +183,14 @@ When incense is purchased:
 ```txt
 → Bot detects purchase
 → Channel auto pauses
-→ Overpause timer starts
-→ Watch channel receives alert if not resumed
+```
+
+When incense is paused:
+
+```txt
+→ Bot detects pause
+→ Starts overpause timer
+→ Sends warning to watch channel if not resumed
 ```
 
 ---
@@ -177,6 +207,8 @@ When incense is purchased:
 | `/resume`        | Resume current channel      |
 | `/pauseall`      | Pause all channels          |
 | `/resumeall`     | Resume all channels         |
+| `/testpauseall`  | Pauses with log of failed   |
+| `/testresumeall` | Resumes with log of failed  |
 | `/incbought`     | View incense progress       |
 | `/setstaffrole`  | Set staff role              |
 | `/setwatchannel` | Set overpause alert channel |
@@ -184,19 +216,36 @@ When incense is purchased:
 
 ---
 
-# Future Ideas
+# Railway Hosting
 
-* Queue rotation system
-* Incense timers
-* Auto resume scheduling
-* Dashboard web panel
-* Statistics tracking
-* Multi-server management
-* Button UI
-* Redis support
+Recommended Railway setup:
+
+## Start Command
+
+```bash
+npm start
+```
+
+## Persistent Volume
+
+Attach a Railway volume for:
+
+```txt
+queue.db
+
+- Queue rotation system
+- Incense timers
+- Auto resume scheduling
+- Dashboard web panel
+- Statistics tracking
+- Multi-server management
+- Button UI
+- Redis support
 
 ---
 
 # License
 
-MIT
+Made by a flooflover 
+
+```
