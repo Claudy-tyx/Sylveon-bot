@@ -6,6 +6,7 @@ const {
   PermissionsBitField,
   ChannelType,
   EmbedBuilder,
+  Options,
 } = require("discord.js");
 
 const {
@@ -21,6 +22,16 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
   ],
+
+  makeCache: Options.cacheWithLimits({
+    MessageManager: 0,
+    GuildMemberManager: 1,
+    UserManager: 1,
+    ReactionManager: 0,
+    GuildEmojiManager: 0,
+    GuildStickerManager: 0,
+    ThreadManager: 0,
+  }),
 });
 
 const OVERPAUSE_TIME = 3 * 60 * 1000;
